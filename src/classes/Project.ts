@@ -39,6 +39,7 @@ export class Project implements IProject{
     this.setUI()
   }
 
+  // creates the project card ui
   setUI() {
     
     if (this.ui) {return}
