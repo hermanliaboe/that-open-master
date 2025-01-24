@@ -9,10 +9,10 @@ export class ProjectsManager {
     this.ui = container
 
     this.newProject({
-      name: "Default Project",
-      description: "This is a default app project",
-      status: "pending",
-      userRole: "architect",
+      name: "Default small and big Project",
+      description: "This is the big small default app project",
+      status: "finished",
+      userRole: "developer",
       finishDate: new Date()
     })
   }
@@ -35,11 +35,32 @@ export class ProjectsManager {
       if (!projectsPage || !detailsPage) { return }
       projectsPage.style.display = "none"
       detailsPage.style.display = "flex"
+      this.setDetailsPage(project)
     })
 
     this.ui.append(project.ui)
     this.list.push(project)
     return project
+  }
+
+  private setDetailsPage (project: Project) {
+    const detailsPage = document.getElementById("project-details")
+    if (!detailsPage) { return }
+    for (const key in project) {
+      if (Object.prototype.hasOwnProperty.call(project, key)) {
+        let value = project[key as keyof Project];
+        if (key === "cost") {
+          value = `$${value}`
+        }
+        if (key === "finishDate"  && value instanceof Date) {
+          value = value.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+        const elements = detailsPage.querySelectorAll(`[data-project-info='${key}']`)
+        elements.forEach((element) => {
+          if (element) { element.textContent = String(value) }
+        })
+      }
+    }
   }
 
   getProject(id: string) {

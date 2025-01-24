@@ -1,0 +1,3 @@
+DOM: Document Object Model
+It's basically the datatree of the document/app/webpage. 
+Hey datatree give me the element that has id...
