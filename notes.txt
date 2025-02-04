@@ -1,3 +1,49 @@
 DOM: Document Object Model
 It's basically the datatree of the document/app/webpage. 
 Hey datatree give me the element that has id...
+
+variables: const for constant variables, let for variable variables. always use const if possible
+
+const newValue = result >= 30 ? 1 : 2. check is result is greater than 30, then 1, if not then 2.
+
+Array/object spreading:
+const objA = {key1: "Value 1", key2: "Value2"}
+const objB = {key3: "Value 3", key4: "Value4"}
+
+const objC = {...objA} #copies the values of A into C
+const objC = {...objA, ...objB} # key1: "Value 1", key2: "Value2", key3: "Value 3", key4: "Value4"
+
+const user = { name: "Juan", lastName: "Hoyos", age: "28"}
+can asign to new variables like this: const { age, name, lastName, ...otherInfo } = user
+age is now the users age
+...otherInfo: the rest operator. containes the rest of the user objects.
+const myArray = [1,2,3]
+const [first,second,third] = myArray: first=1, second=2, third=3
+
+Promises
+JavaScript doesnt wait for each line to finish
+let's say you have a const userData = getUserdata(). it uses a function that takes time to execute. the next lines will execute while waiting on this.
+if you want the value before moving on, you need to write like this:
+const userData = await getUserData()
+you can only use await if the JavaScript file is set as a module. check this in the index.html
+if you want to use await inside a function, the funtion needs to be of type async
+this is called asyncronised programming or something
+async function getUserJob() {
+  const userData = await getUserData()
+  const { job } = userData
+  return job
+}
+
+class extending
+inhereting
+class AdminUser extends User {
+  constructor () {
+    super()
+  }
+  kickUser() {}
+  moderateMessage() {}
+}
+you can only extend from one class, you have to use constructor super
+
+
+when editing: 5 characters still not allowed in name. need to get the edit-project-modal up when pressing edit....

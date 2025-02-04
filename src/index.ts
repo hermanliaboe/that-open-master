@@ -1,4 +1,4 @@
-import { IProject, ProjectStatus, UserRole } from "./classes/Project"
+import { IProject, ITodo, ProjectStatus, UserRole } from "./classes/Project"
 import { ProjectsManager } from "./classes/ProjectsManager"
 
 function toggleModal(id: string, show: boolean) {
@@ -62,6 +62,48 @@ if (projectForm && projectForm instanceof HTMLFormElement) {
 } else {
   console.warn("The project form was not found. Check the ID!")
 }
+
+const editProjectForm = document.getElementById("edit-project-form")
+if (editProjectForm && editProjectForm instanceof HTMLFormElement) {
+  editProjectForm.addEventListener("submit", (e) => {
+    e.preventDefault()
+    const formData = new FormData(editProjectForm)
+    const projectData: IProject = {
+      name: formData.get("name") as string,
+      description: formData.get("description") as string,
+      status: formData.get("status") as ProjectStatus,
+      userRole: formData.get("userRole") as UserRole,
+      finishDate: new Date(formData.get("finishDate") as string)
+    }
+    try {
+      const projectId = editProjectForm.getAttribute("data-project-id");
+      if (projectId) {
+        const project = projectsManager.editProjectDetails(projectData, projectId)
+      } else {
+        throw new Error("Project ID is null.")
+      }
+      editProjectForm.reset()
+      toggleModal("edit-project-modal", false)
+    } catch (error) {
+      alert(error)
+    }
+    
+  })
+  const cancelEditProjectFormBtn = document.getElementById("cancel-edit-project-form-button")
+  if (cancelEditProjectFormBtn) {
+    cancelEditProjectFormBtn.addEventListener("click", () => {
+      editProjectForm.reset()
+      toggleModal("edit-project-modal", false)})
+  } else {
+    console.warn("Cancel edit project form button was not found.")
+  }
+} else {
+  console.warn("The edit project form was not found. Check the ID!")
+}
+
+// todo form
+
+// todo form
 
 const exportProjectsBtn = document.getElementById("export-projects-btn")
 if (exportProjectsBtn) {

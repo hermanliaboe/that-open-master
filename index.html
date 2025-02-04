@@ -17,7 +17,7 @@
   </aside>
   <main id="content">
     <div class="page" id="projects-page">
-      <dialog id="new-project-modal">
+      <dialog id="new-project-modal" class="modal">
         <form id="new-project-form">
           <h2>New Project</h2>
           <div class="input-list">
@@ -71,6 +71,113 @@
       <div id="projects-list"></div>
     </div>
     <div class="page" id="project-details" style="display: none;">  <!-- project details for each project card -->
+      <dialog id="add-todo-modal" class="modal">
+        <form id="add-todo-form">
+          <h2>Add Todo</h2>
+          <div class="input-list">
+            <div class="form-field-container">
+              <label><span class="material-icons-round">description</span>Description</label>
+              <textarea name="todoDescription" id="todo-description" cols="30" rows="5" placeholder="Describe the task" required></textarea>
+            </div>
+            <div class="form-field-container">
+              <label><span class="material-icons-round">priority_high</span>Priority</label>
+              <select name="priority" id="todo-priority" required>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Normal">Normal</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+            <div class="form-field-container">
+              <label><span class="material-icons-round">assignment</span>Status</label>
+              <select name="status" id="todo-status" required>
+                <option value="New">New</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+            <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 10px;">
+              <button type="button" id="cancel-add-todo-form-button" style="background-color: transparent;">Cancel</button>
+              <button type="submit" style="background-color: rgb(18, 145, 18);">Add Todo</button>
+            </div>
+          </div>
+        </form>
+      </dialog>
+      <dialog id="edit-todo-modal" class="modal">
+        <form id="edit-todo-form">
+          <h2>Edit Todo</h2>
+          <div class="input-list">
+            <div class="form-field-container">
+              <label><span class="material-icons-round">description</span>Description</label>
+              <textarea name="todoDescription" id="edit-todo-description" cols="30" rows="5" placeholder="Describe the task" required></textarea>
+            </div>
+            <div class="form-field-container">
+              <label><span class="material-icons-round">priority_high</span>Priority</label>
+              <select name="priority" id="edit-todo-priority" required>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Normal">Normal</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+            <div class="form-field-container">
+              <label><span class="material-icons-round">assignment</span>Status</label>
+              <select name="status" id="edit-todo-status" required>
+                <option value="New">New</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+            <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 10px;">
+              <button type="button" id="cancel-edit-todo-form-button" style="background-color: transparent;">Cancel</button>
+              <button type="submit" style="background-color: rgb(18, 145, 18);">Save</button>
+            </div>
+          </div>
+        </form>
+      </dialog>
+      <dialog id="edit-project-modal" class="modal">
+        <form id="edit-project-form">
+          <h2>Edit Project</h2>
+          <div class="input-list">
+            <div class="form-field-container">
+              <label><span class="material-icons-round">apartment</span>Name</label>
+              <input name="name" type="text" id="edit-project-name" placeholder="What's the name of your project?" required>
+              <p style="color: gray; font-size: var(--font-sm); margin-top: 5px; font-style: italic;">TIP: Give it a short name</p>
+            </div>
+            <div class="form-field-container">
+              <label><span class="material-icons-round">subject</span>Description</label>
+              <textarea name="description" id="edit-project-description" cols="30" rows="5" placeholder="Give your project a nice description! So people is jealous about it." required></textarea>
+            </div>
+            <div class="form-field-container">
+              <label><span class="material-icons-round">person</span>Role</label>
+              <select name="userRole" id="edit-project-role" required>
+                <option>Architect</option>
+                <option>Engineer</option>
+                <option>Developer</option>
+              </select>
+            </div>
+            <div class="form-field-container">
+              <label><span class="material-icons-round">not_listed_location</span>Status</label>
+              <select name="status" id="edit-project-status" required>
+                <option>Pending</option>
+                <option>Active</option>
+                <option>Finished</option>
+              </select>
+            </div>
+            <div class="form-field-container">
+              <label for="finishDate">
+                <span class="material-icons-round">calendar_month</span>
+                Finish Date
+              </label>
+              <input name="finishDate" type="date" id="edit-project-finish-date" required>
+            </div>
+            <div style="display: flex; margin: 10px 0px 10px auto; column-gap: 10px;">
+              <button type="button" id="cancel-edit-project-form-button" style="background-color: transparent;">Cancel</button>
+              <button type="submit" style="background-color: rgb(18, 145, 18);">Save Changes</button>
+            </div>
+          </div>
+        </form>
+      </dialog>
       <header> 
         <!-- headline container for example Hospital Center -->
         <div>
@@ -85,8 +192,8 @@
            <div class="dashboard-card" style="padding: 30px 0;">
             <!-- first dashboard card including info about the project such as role, staus, date etc -->
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0px 30px; margin-bottom: 30px;">
-              <p style="font-size: 20px; background-color: #ca8134; aspect-ratio: 1; border-radius: 100%; padding: 12px;">HC</p>
-              <button class="btn-secondary"><p style="width: 100%;">Edit</p></button>
+              <p style="font-size: 20px; background-color: #ca8134; aspect-ratio: 1; border-radius: 100%; padding: 12px;" data-project-info="logo">HC</p>
+              <button id="edit-button" class="btn-secondary"><p style="width: 100%;">Edit</p></button>
             </div>
             <div style="padding: 0 30px;">
               <div>
@@ -121,23 +228,15 @@
               <h4>To-Do</h4>
               <div style="display: flex; align-items: center; justify-content: end; column-gap: 20px;">
                 <div style="display: flex; align-items: center; column-gap: 10px;">
-                  <span class="material-icons-round">search</span>
-                  <input type="text" placeholder="Search To-Do's by name" style="width: 100%;">
+                  <span class="material-icons-round action-icon">search</span>
+                  <input id="todo-search-bar" type="text" placeholder="Search To-Do's by name" style="width: 100%;">
                 </div>
-                <span class="material-icons-round">add</span>
+                <span id="add-todo-button" class="material-icons-round action-icon">add</span>
               </div>
             </div>
-            <div style="display: flex; flex-direction: column; padding: 10px 30px; row-gap: 20px;">
-              <div class="todo-item">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <div style="display: flex; column-gap: 15px; align-items: center;">
-                    <span class="material-icons-round" style="padding: 10px; background-color: #686868; border-radius: 10px;">construction</span>
-                    <p>Make anything here as you want, even something longer.</p>
-                  </div>
-                  <p style="text-wrap: nowrap; margin-left: 10px;">Fri, 20 sep</p>
-                </div>
-              </div>
-            </div>
+            <ul id="todo-list" style="display: flex; flex-direction: column; padding: 10px 30px; row-gap: 20px;">
+              <!-- To-do items will be dynamically added here -->
+            </ul>
           </div>
         </div>
         <div id="viewer-container" class="dashboard-card"></div>
