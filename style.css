@@ -24,7 +24,7 @@
   padding: 0;
 }
 
-body {
+#app {
   display: grid;
   grid-template-columns: 300px 1fr;
   grid-template-areas: 'sidebar content';
@@ -90,6 +90,11 @@ button:hover {
 	height: 65px;
 }
 
+#nav-buttons a {
+  text-decoration: none;
+  color: white;
+}
+
 #nav-buttons {
   display: flex;
   flex-direction: column;
@@ -120,6 +125,11 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+#projects-list a {
+  text-decoration: none;
+  color: white;
 }
 
 .project-card {

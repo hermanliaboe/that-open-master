@@ -3,21 +3,11 @@ import { IProject, Project, ITodo } from "./Project"
 export class ProjectsManager {
 
   list: Project[] = []
-  ui: HTMLElement
+  onProjectCreated = (project: Project) => {}
+  onProjectDeleted = (id: string) => {}
+  onProjectUpdated = (project: Project) => {}
 
-  constructor(container: HTMLElement) {
-    this.ui = container
-
-    this.newProject({
-      name: "Default small and big Project",
-      description: "This is the big small default app project",
-      status: "Finished",
-      userRole: "Developer",
-      finishDate: new Date()
-    })
-  }
-
-  newProject(data: IProject) {
+  newProject(data: IProject, id?: string) {
     const projectNames = this.list.map((project) => {
       return project.name
     })
@@ -28,19 +18,10 @@ export class ProjectsManager {
     if (data.name.length < 5) {
       throw new Error("Project name must be at least 5 characters long")
     }
-    const project = new Project(data)
+    const project = new Project(data, id)
 
-    project.ui.addEventListener("click", () => {
-      const projectsPage = document.getElementById("projects-page")
-      const detailsPage = document.getElementById("project-details")
-      if (!projectsPage || !detailsPage) { return }
-      projectsPage.style.display = "none"
-      detailsPage.style.display = "flex"
-      this.setDetailsPage(project)
-    })
-
-    this.ui.append(project.ui)
     this.list.push(project)
+    this.onProjectCreated(project)
     return project
   }
   
@@ -50,80 +31,7 @@ export class ProjectsManager {
   private addTodoFormEventListenerAdded = false;
   private editTodoFormEventListenerAdded = false;
 
-  private setDetailsPage(project: Project) {
-    const detailsPage = document.getElementById("project-details")
-    if (!detailsPage) { return }
 
-    // Populate project details
-    for (const key in project) {
-      if (Object.prototype.hasOwnProperty.call(project, key)) {
-        let value = project[key as keyof Project];
-        if (key === "cost") {
-          value = `$${value}`
-        }
-        if (key === "finishDate" && value instanceof Date) {
-          value = value.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-        }
-        const elements = detailsPage.querySelectorAll(`[data-project-info='${key}']`)
-        elements.forEach((element) => {
-          if (element) { 
-            if (key == "logo") {
-              element.textContent = String(value)
-              element.setAttribute("style", `background-color: ${project.color}; padding: 10px; border-radius: 8px; aspect-ratio: 1;`)
-            }
-            else {
-              element.textContent = String(value)
-            }
-          }
-        })
-      }
-    }
-
-    // Populate todos
-    const todoList = document.getElementById("todo-list");
-    if (todoList) {
-      todoList.innerHTML = "";
-      project.getTodos().forEach(todo => {
-        this.appendTodoItem(todoList, todo, project);
-      });
-    }
-
-      // Add new event listeners only if they haven't been added yet
-    if (!this.detailsPageEventListenersAdded) {
-      const editButton = document.getElementById("edit-button");
-      const todoSearchBar = document.getElementById("todo-search-bar");
-      const addTodoButton = document.getElementById("add-todo-button");
-
-      if (editButton) {
-        editButton.addEventListener("click", () => {
-          this.showEditProjectModal(project);
-        });
-      }
-
-      if (todoSearchBar) {
-        todoSearchBar.addEventListener("input", (e) => {
-          const searchTerm = (e.target as HTMLInputElement).value;
-          this.searchTodos(searchTerm, todoList);
-        });
-      }
-
-      if (addTodoButton) {
-        addTodoButton.addEventListener("click", () => {
-          this.toggleModal("add-todo-modal", true);
-          try {
-            if (todoList) {
-              this.addTodoToProject(project, todoList);
-            }
-          } catch (error) {
-            alert(`Failed to add to-do: ${error.message}`);
-          }
-          
-        });
-      }
-
-      this.detailsPageEventListenersAdded = true;
-    }
-  }
 
 
   addTodoToProject(project: Project, todoList: HTMLElement) {
@@ -233,7 +141,7 @@ export class ProjectsManager {
         };
         try {
           project.updateTodo(updatedTodoData);
-          this.setDetailsPage(project); // Refresh the details page to reflect changes
+       
           (editTodoForm as HTMLFormElement).reset();
           this.toggleModal("edit-todo-modal", false);
         } catch (error) {
@@ -292,8 +200,7 @@ export class ProjectsManager {
       project.userRole = data.userRole;
       project.finishDate = data.finishDate;
       project.logo = data.name.slice(0, 2).toUpperCase(); // Update the logo
-      project.updateUI();
-      this.setDetailsPage(project);
+
     }
   }
 
@@ -320,11 +227,12 @@ export class ProjectsManager {
   deleteProject(id: string) {
     const project = this.getProject(id)
     if (!project) { return }
-    project.ui.remove()
+
     const remaining = this.list.filter((project) => {
       return project.id !== id
     })
     this.list = remaining
+    this.onProjectDeleted(id)
   }
 
   calculateCostOfAllProjects() {
@@ -342,10 +250,8 @@ export class ProjectsManager {
   }
 
   exportToJSON(fileName: string = "projects") {
-    // Create a new array of projects excluding the ui attribute
-    const projectsWithoutUI = this.list.map(({ ui, ...project }) => project);
 
-    const json = JSON.stringify(projectsWithoutUI, null, 2)
+    const json = JSON.stringify(this.list, null, 2)
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -395,24 +301,30 @@ export class ProjectsManager {
   }
   
 
-  updateProject(existingProject: IProject, newProjectData: IProject) {
+  updateProject(project: Project, newProjectData: IProject) {
     for (const key in newProjectData) {
       if (newProjectData.hasOwnProperty(key) && key !== 'id') {
         if (key === 'finishDate' && typeof newProjectData[key] === 'string') {
-          existingProject[key] = new Date(newProjectData[key]);
+          project[key] = new Date(newProjectData[key]);
         } else if (key === 'todos' && Array.isArray(newProjectData[key])) {
-          existingProject[key] = newProjectData[key].map((todo) => ({
+          project[key] = newProjectData[key].map((todo) => ({
             ...todo,
             date: new Date(todo.date)
           }));
         } else {
-          existingProject[key] = newProjectData[key];
+          project[key] = newProjectData[key];          
         }
       }
     }
-  
-    if (existingProject instanceof Project) {
-      existingProject.updateUI();
-    }
+    project.logo = newProjectData.name.slice(0, 2).toUpperCase(); // Update the logo
+    this.onProjectUpdated(project);
+
+  }
+
+  filterProjects(value: string) {
+    const filteredProjects = this.list.filter((project) => {
+      return project.name.toLowerCase().includes(value.toLowerCase())
+    })
+    return filteredProjects
   }
 }

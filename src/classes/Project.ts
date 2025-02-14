@@ -33,20 +33,20 @@ export class Project implements IProject {
   color: string
 
   // Class internals
-  ui: HTMLDivElement
   cost: number = 0
-  progress: number = 0
+  progress: number = 80
   id: string
 
-  constructor(data: IProject) {
+  constructor(data: IProject, id = uuidv4()) {
     for (const key in data) {
       this[key] = data[key]
     }
 
     // Check if finishDate is valid
-    if (!(this.finishDate instanceof Date) || isNaN(this.finishDate.getUTCDay())) {
-      this.finishDate = new Date(new Date().setMonth(new Date().getMonth() + 1)); // Set default finish date to one month from today
-    }
+    // if (!(this.finishDate instanceof Date)) {
+    //   this.finishDate = new Date(new Date().setMonth(new Date().getMonth() + 1)); // Set default finish date to one month from today
+    //   console.log("date was set to", this.finishDate)
+    // }
 
     // Convert todo dates from strings to Date objects
     if (this.todos) {
@@ -56,72 +56,18 @@ export class Project implements IProject {
       }))
     }
 
-    if (!data.id) {
-      this.id = uuidv4()
-    }
+    this.id = id
 
-    this.logo = this.logo || this.name.slice(0, 2).toUpperCase(); // Initialize the logo
-    this.color = this.colors[Math.floor(Math.random() * this.colors.length)]; // Initialize the color
+    this.logo = this.name.slice(0, 2).toUpperCase(); // Initialize the logo
+    if (!this.color) { this.color = this.colors[Math.floor(Math.random() * this.colors.length)] }
 
-    // Set project card UI
-    this.setUI()
+    
   }
   // Array of possible colors
   private colors: string[] = ["#ca8134", "#3498db", "#e74c3c", "#2ecc71", "#9b59b6", "#f1c40f"];
 
-  // Creates the project card UI
-  setUI() {
-    if (this.ui) { return }
+  
 
-    this.ui = document.createElement("div")
-    this.ui.className = "project-card"
-    this.ui.innerHTML = `
-    <div class="card-header">
-      <p style="background-color: ${this.color}; padding: 10px; border-radius: 8px; aspect-ratio: 1;" data-project-info="logo">${this.logo}</p>
-      <div>
-        <h5 data-project-info="name">${this.name}</h5>
-        <p data-project-info="description">${this.description}</p>
-      </div>
-    </div>
-    <div class="card-content">
-      <div class="card-property">
-        <p style="color: #969696;">Status</p>
-        <p data-project-info="status">${this.status}</p>
-      </div>
-      <div class="card-property">
-        <p style="color: #969696;">Role</p>
-        <p data-project-info="userRole">${this.userRole}</p>
-      </div>
-      <div class="card-property">
-        <p style="color: #969696;">Cost</p>
-        <p data-project-info="cost">$${this.cost}</p>
-      </div>
-      <div class="card-property">
-        <p style="color: #969696;">Estimated Progress</p>
-        <p data-project-info="progress">${this.progress * 100}%</p>
-      </div>
-    </div>
-    `
-  }
-
-  // Update the project UI with new details
-  updateUI() {
-    if (!this.ui) { return }
-    const elements = this.ui.querySelectorAll("[data-project-info]");
-    elements.forEach((element) => {
-      const key = element.getAttribute("data-project-info");
-      if (key) {
-        let value = this[key as keyof Project];
-        if (key === "cost") {
-          value = `$${value}`;
-        }
-        if (key === "finishDate" && value instanceof Date) {
-          value = value.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        }
-        element.textContent = String(value);
-      }
-    });
-  }
 
   // Add a new todo
   addTodo(todoData: ITodo) {
@@ -129,7 +75,13 @@ export class Project implements IProject {
       throw new Error("To-do text cannot be empty.");
     }
 
-    todoData.id = uuidv4();
+    if (!(todoData.date instanceof Date) || isNaN(todoData.date.getTime())) {
+      throw new Error("Invalid date in todo.");
+    }
+
+    if (!todoData.id) {
+      todoData.id = uuidv4();
+    }
     this.todos.push(todoData);
   }
 
